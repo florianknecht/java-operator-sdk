@@ -2,6 +2,7 @@ package io.javaoperatorsdk.operator.processing.dependent;
 
 import io.fabric8.kubernetes.api.model.HasMetadata;
 import io.javaoperatorsdk.operator.api.reconciler.Context;
+import io.javaoperatorsdk.operator.api.reconciler.dependent.Deleter;
 import io.javaoperatorsdk.operator.api.reconciler.dependent.ReconcileResult;
 
 class SingleDependentResourceReconciler<R, P extends HasMetadata>
@@ -20,8 +21,10 @@ class SingleDependentResourceReconciler<R, P extends HasMetadata>
   }
 
   @Override
+  @SuppressWarnings("unchecked")
   public void delete(P primary, Context<P> context) {
-    var secondary = instance.getSecondaryResource(primary, context);
-    instance.handleDelete(primary, secondary.orElse(null), context);
+    if (instance instanceof Deleter) {
+      ((Deleter<P>) instance).delete(primary, context);
+    }
   }
 }

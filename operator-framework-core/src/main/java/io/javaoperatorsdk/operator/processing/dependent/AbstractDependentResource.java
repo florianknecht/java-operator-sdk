@@ -205,15 +205,6 @@ public abstract class AbstractDependentResource<R, P extends HasMetadata>
             + " updated");
   }
 
-  public void delete(P primary, Context<P> context) {
-    dependentResourceReconciler.delete(primary, context);
-  }
-
-  protected void handleDelete(P primary, R secondary, Context<P> context) {
-    throw new IllegalStateException(
-        "handleDelete method must be implemented if Deleter trait is supported");
-  }
-
   protected boolean isCreatable() {
     return creatable;
   }

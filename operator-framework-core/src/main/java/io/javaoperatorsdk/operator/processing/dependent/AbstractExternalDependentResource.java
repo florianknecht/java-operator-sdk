@@ -2,6 +2,7 @@ package io.javaoperatorsdk.operator.processing.dependent;
 
 import io.fabric8.kubernetes.api.model.HasMetadata;
 import io.javaoperatorsdk.operator.api.reconciler.Context;
+import io.javaoperatorsdk.operator.api.reconciler.dependent.Deleter;
 import io.javaoperatorsdk.operator.api.reconciler.dependent.RecentOperationCacheFiller;
 import io.javaoperatorsdk.operator.processing.event.EventSourceRetriever;
 import io.javaoperatorsdk.operator.processing.event.ResourceID;
@@ -10,7 +11,7 @@ import io.javaoperatorsdk.operator.processing.event.source.informer.InformerEven
 
 public abstract class AbstractExternalDependentResource<
         R, P extends HasMetadata, T extends EventSource<R, P>>
-    extends AbstractEventSourceHolderDependentResource<R, P, T> {
+    extends AbstractEventSourceHolderDependentResource<R, P, T> implements Deleter<P> {
 
   private final boolean isDependentResourceWithExplicitState =
       this instanceof DependentResourceWithExplicitState;
@@ -57,11 +58,8 @@ public abstract class AbstractExternalDependentResource<
   public void delete(P primary, Context<P> context) {
     if (isDependentResourceWithExplicitState && !isBulkDependentResource) {
       var secondary = getSecondaryResource(primary, context);
-      super.delete(primary, context);
       // deletes the state after the resource is deleted
       handleExplicitStateDelete(primary, secondary.orElse(null), context);
-    } else {
-      super.delete(primary, context);
     }
   }
 

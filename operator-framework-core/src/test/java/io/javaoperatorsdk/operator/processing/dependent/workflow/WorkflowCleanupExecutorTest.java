@@ -70,7 +70,7 @@ class WorkflowCleanupExecutorTest extends AbstractWorkflowExecutorTest {
     assertThat(executionHistory).reconciledInOrder(dd3, dd2, dd1).notReconciled(dr1);
 
     Assertions.assertThat(res.getDeleteCalledOnDependents())
-        .containsExactlyInAnyOrder(dd1, dd2, dd3);
+        .containsExactlyInAnyOrder(dr1, dd1, dd2, dd3);
     Assertions.assertThat(res.getErroredDependents()).isEmpty();
     Assertions.assertThat(res.getPostConditionNotMetDependents()).isEmpty();
   }

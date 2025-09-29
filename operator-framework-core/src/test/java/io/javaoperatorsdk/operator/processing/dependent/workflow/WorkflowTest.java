@@ -93,7 +93,7 @@ class WorkflowTest {
     assertTrue(DefaultWorkflow.isDeletable(dr.getClass()));
 
     dr = mock(KubernetesDependentResource.class);
-    assertFalse(DefaultWorkflow.isDeletable(dr.getClass()));
+    assertTrue(DefaultWorkflow.isDeletable(dr.getClass()));
 
     dr = mock(KubernetesDependentResource.class, withSettings().extraInterfaces(Deleter.class));
     assertTrue(DefaultWorkflow.isDeletable(dr.getClass()));
@@ -101,7 +101,7 @@ class WorkflowTest {
     dr =
         mock(
             KubernetesDependentResource.class,
-            withSettings().extraInterfaces(Deleter.class, GarbageCollected.class));
+            withSettings().extraInterfaces(GarbageCollected.class));
     assertFalse(DefaultWorkflow.isDeletable(dr.getClass()));
   }
 

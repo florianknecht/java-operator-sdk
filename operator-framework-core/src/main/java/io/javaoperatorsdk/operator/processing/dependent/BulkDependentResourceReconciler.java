@@ -139,5 +139,11 @@ class BulkDependentResourceReconciler<R, P extends HasMetadata>
     public boolean isDeletable() {
       return bulkDependentResource instanceof Deleter<?>;
     }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public void delete(P primary, Context<P> context) {
+      ((Deleter<P>) bulkDependentResource).delete(primary, context);
+    }
   }
 }

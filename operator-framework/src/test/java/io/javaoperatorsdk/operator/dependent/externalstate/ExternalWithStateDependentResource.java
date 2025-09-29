@@ -10,6 +10,7 @@ import io.fabric8.kubernetes.api.model.ConfigMap;
 import io.fabric8.kubernetes.api.model.ConfigMapBuilder;
 import io.fabric8.kubernetes.api.model.ObjectMetaBuilder;
 import io.javaoperatorsdk.operator.api.reconciler.Context;
+import io.javaoperatorsdk.operator.api.reconciler.dependent.Deleter;
 import io.javaoperatorsdk.operator.processing.dependent.DependentResourceWithExplicitState;
 import io.javaoperatorsdk.operator.processing.dependent.Matcher;
 import io.javaoperatorsdk.operator.processing.dependent.Updater;
@@ -21,7 +22,8 @@ public class ExternalWithStateDependentResource
     extends PerResourcePollingDependentResource<ExternalResource, ExternalStateCustomResource>
     implements DependentResourceWithExplicitState<
             ExternalResource, ExternalStateCustomResource, ConfigMap>,
-        Updater<ExternalResource, ExternalStateCustomResource> {
+        Updater<ExternalResource, ExternalStateCustomResource>,
+        Deleter<ExternalStateCustomResource> {
 
   ExternalIDGenServiceMock externalService = ExternalIDGenServiceMock.getInstance();
 
@@ -108,10 +110,9 @@ public class ExternalWithStateDependentResource
   }
 
   @Override
-  protected void handleDelete(
-      ExternalStateCustomResource primary,
-      ExternalResource secondary,
-      Context<ExternalStateCustomResource> context) {
-    externalService.delete(secondary.getId());
+  public void delete(
+      ExternalStateCustomResource primary, Context<ExternalStateCustomResource> context) {
+    getSecondaryResource(primary, context)
+        .ifPresent(secondary -> externalService.delete(secondary.getId()));
   }
 }

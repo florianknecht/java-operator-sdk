@@ -17,6 +17,7 @@ import io.javaoperatorsdk.operator.api.config.informer.InformerEventSourceConfig
 import io.javaoperatorsdk.operator.api.reconciler.Context;
 import io.javaoperatorsdk.operator.api.reconciler.EventSourceContext;
 import io.javaoperatorsdk.operator.api.reconciler.Ignore;
+import io.javaoperatorsdk.operator.api.reconciler.dependent.Deleter;
 import io.javaoperatorsdk.operator.api.reconciler.dependent.GarbageCollected;
 import io.javaoperatorsdk.operator.api.reconciler.dependent.managed.ConfiguredDependentResource;
 import io.javaoperatorsdk.operator.processing.GroupVersionKind;
@@ -34,7 +35,7 @@ import io.javaoperatorsdk.operator.processing.event.source.informer.Mappers;
     converter = KubernetesDependentConverter.class)
 public abstract class KubernetesDependentResource<R extends HasMetadata, P extends HasMetadata>
     extends AbstractEventSourceHolderDependentResource<R, P, InformerEventSource<R, P>>
-    implements ConfiguredDependentResource<KubernetesDependentResourceConfig<R>> {
+    implements ConfiguredDependentResource<KubernetesDependentResourceConfig<R>>, Deleter<P> {
 
   private static final Logger log = LoggerFactory.getLogger(KubernetesDependentResource.class);
 
@@ -184,10 +185,9 @@ public abstract class KubernetesDependentResource<R extends HasMetadata, P exten
   }
 
   @Override
-  protected void handleDelete(P primary, R secondary, Context<P> context) {
-    if (secondary != null) {
-      context.getClient().resource(secondary).delete();
-    }
+  public void delete(P primary, Context<P> context) {
+    getSecondaryResource(primary, context)
+        .ifPresent(secondary -> context.getClient().resource(secondary).delete());
   }
 
   @SuppressWarnings("unused")

@@ -88,11 +88,11 @@ public class BulkDependentResourceExternalWithState
   }
 
   @Override
-  protected void handleDelete(
+  public void delete(
       ExternalStateBulkDependentCustomResource primary,
-      ExternalResource secondary,
       Context<ExternalStateBulkDependentCustomResource> context) {
-    externalService.delete(secondary.getId());
+    getSecondaryResource(primary, context)
+        .ifPresent(secondary -> externalService.delete(secondary.getId()));
   }
 
   @Override
